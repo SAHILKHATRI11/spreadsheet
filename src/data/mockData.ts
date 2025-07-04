@@ -2,7 +2,7 @@ export interface RowData {
   id: number;
   jobRequest: string;
   submitted: string;
-  status?: string;
+  status: string;
   submitter: string;
   url: string;
   assigned: string;

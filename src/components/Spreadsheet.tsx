@@ -1,4 +1,3 @@
-import React from "react";
 import { mockData } from "../data/mockData";
 
 function Spreadsheet() {
@@ -95,7 +94,7 @@ function Spreadsheet() {
           <tbody>
             {mockData.map((row, i) => (
               <tr key={i} className="hover:bg-gray-50">
-                {Object.entries(row).map(([_key, cell], j) => (
+                {Object.entries(row).map(([, cell], j) => (
                   <td key={j} className="px-4 py-2 border-b border-gray-200">
                     {cell}
                   </td>

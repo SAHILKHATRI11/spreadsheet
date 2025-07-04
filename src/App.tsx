@@ -1,4 +1,6 @@
-import React, { useState, useCallback } from "react";
+import React, { useState } from "react";
+import type { LucideIcon } from "lucide-react";
+
 import {
   Search,
   Plus,
@@ -6,7 +8,6 @@ import {
   Share,
   Import,
   Download,
-  MoreHorizontal,
   Eye,
   EyeOff,
   ArrowUpDown,
@@ -15,18 +16,36 @@ import {
   DollarSign,
   User,
   Link,
-  CheckCircle,
-  Clock,
-  XCircle,
   AlertCircle,
 } from "lucide-react";
 
+type SpreadsheetRow = {
+  id: number;
+  jobRequest: string;
+  submitted: string;
+  status: string;
+  submitter: string;
+  url: string;
+  assigned: string;
+  priority: string;
+  dueDate: string;
+  estValue: string;
+};
+
+type SortConfig = {
+  key: keyof SpreadsheetRow | null;
+  direction: "asc" | "desc";
+};
+
 const Spreadsheet = () => {
-  const [activeTab, setActiveTab] = useState("All Orders");
-  const [selectedCells, setSelectedCells] = useState(new Set());
-  const [searchTerm, setSearchTerm] = useState("");
-  const [hideFields, setHideFields] = useState(false);
-  const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
+  const [activeTab, setActiveTab] = useState<string>("All Orders");
+  const [selectedCells, setSelectedCells] = useState<Set<string>>(new Set());
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [hideFields, setHideFields] = useState<boolean>(false);
+  const [sortConfig, setSortConfig] = useState<SortConfig>({
+    key: null,
+    direction: "asc",
+  });
 
   // Sample data matching the Figma design
   const [spreadsheetData, setSpreadsheetData] = useState([
@@ -94,7 +113,11 @@ const Spreadsheet = () => {
 
   const tabs = ["All Orders", "Pending", "Reviewed", "Arrived"];
 
-  const columns = [
+  const columns: {
+    key: keyof SpreadsheetRow;
+    label: string;
+    icon: LucideIcon;
+  }[] = [
     { key: "jobRequest", label: "Job Request", icon: FileText },
     { key: "submitted", label: "Submitted", icon: Calendar },
     { key: "status", label: "Status", icon: AlertCircle },
@@ -106,7 +129,7 @@ const Spreadsheet = () => {
     { key: "estValue", label: "Est. Value", icon: DollarSign },
   ];
 
-  const getStatusColor = (status) => {
+  const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
       case "to start":
         return "bg-blue-100 text-blue-800";
@@ -121,7 +144,7 @@ const Spreadsheet = () => {
     }
   };
 
-  const getPriorityColor = (priority) => {
+  const getPriorityColor = (priority: string) => {
     switch (priority.toLowerCase()) {
       case "high":
         return "bg-red-100 text-red-800";
@@ -134,7 +157,7 @@ const Spreadsheet = () => {
     }
   };
 
-  const handleCellClick = (rowId, colKey) => {
+  const handleCellClick = (rowId: number, colKey: string) => {
     const cellId = `${rowId}-${colKey}`;
     setSelectedCells((prev) => {
       const newSet = new Set(prev);
@@ -148,8 +171,8 @@ const Spreadsheet = () => {
     console.log(`Cell clicked: Row ${rowId}, Column ${colKey}`);
   };
 
-  const handleSort = (key) => {
-    let direction = "asc";
+  const handleSort = (key: keyof (typeof spreadsheetData)[0]) => {
+    let direction: "asc" | "desc" = "asc";
     if (sortConfig.key === key && sortConfig.direction === "asc") {
       direction = "desc";
     }
@@ -169,7 +192,7 @@ const Spreadsheet = () => {
     console.log("Filter button clicked");
   };
 
-  const handleSearch = (e) => {
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
     console.log(`Search term: ${e.target.value}`);
   };
@@ -190,7 +213,7 @@ const Spreadsheet = () => {
     console.log("Share button clicked");
   };
 
-  const handleTabChange = (tab) => {
+  const handleTabChange = (tab: string) => {
     setActiveTab(tab);
     console.log(`Tab changed to: ${tab}`);
   };
@@ -200,7 +223,7 @@ const Spreadsheet = () => {
     console.log(`Hide fields: ${!hideFields}`);
   };
 
-  const filteredData = spreadsheetData.filter((row) =>
+  const filteredData = spreadsheetData.filter((row: SpreadsheetRow) =>
     Object.values(row).some((value) =>
       value.toString().toLowerCase().includes(searchTerm.toLowerCase())
     )
@@ -261,7 +284,7 @@ const Spreadsheet = () => {
               <span>Hide fields</span>
             </button>
             <button
-              onClick={handleSort}
+              onClick={() => handleSort("id")}
               className="px-3 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50 transition-colors flex items-center space-x-1"
             >
               <ArrowUpDown className="w-4 h-4" />
@@ -410,7 +433,9 @@ const Spreadsheet = () => {
                         {row[column.key]}
                       </a>
                     ) : (
-                      <span className="text-gray-900">{row[column.key]}</span>
+                      <span className="text-gray-900">
+                        {row[column.key as keyof SpreadsheetRow]}
+                      </span>
                     )}
                   </td>
                 ))}
